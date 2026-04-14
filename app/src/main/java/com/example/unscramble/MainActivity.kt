@@ -23,19 +23,34 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Room
+import com.example.unscramble.data.historyDatabase
 import com.example.unscramble.ui.GameScreen
+import com.example.unscramble.ui.GameViewModel
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
+        val db = Room.databaseBuilder(
+            context = applicationContext,
+            klass = historyDatabase::class.java,
+            name = "history_database"
+        ).build()
+
+        val dao = db.historyDao()
+
         super.onCreate(savedInstanceState)
         setContent {
             UnscrambleTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    GameScreen()
+                    val viewModel : GameViewModel = viewModel {
+                        GameViewModel(dao)
+                    }
+                    GameScreen(gameViewModel = viewModel)
                 }
             }
         }

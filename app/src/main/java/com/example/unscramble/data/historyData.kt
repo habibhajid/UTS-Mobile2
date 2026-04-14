@@ -8,6 +8,6 @@ data class historyData(
 
     val history: String? = null,
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 )

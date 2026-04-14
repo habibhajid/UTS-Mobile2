@@ -20,18 +20,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.unscramble.data.MAX_NO_OF_WORDS
 import com.example.unscramble.data.SCORE_INCREASE
 import com.example.unscramble.data.allWords
+import com.example.unscramble.data.historyDAO
+import com.example.unscramble.data.historyData
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel containing the app data and methods to process the data
  */
-class GameViewModel : ViewModel() {
+class GameViewModel(private val dao: historyDAO) : ViewModel() {
 
     // Game UI state
     private val _uiState = MutableStateFlow(GameUiState())
@@ -43,8 +50,12 @@ class GameViewModel : ViewModel() {
     // Set of words used in the game
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String
-
-    var history: MutableSet<String> = mutableSetOf()
+    val historylist : StateFlow<List<historyData>> = dao.getAllHistory()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     init {
         resetGame()
@@ -75,6 +86,10 @@ class GameViewModel : ViewModel() {
             // and call updateGameState() to prepare the game for next round
             val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
             updateGameState(updatedScore)
+
+            viewModelScope.launch {
+                dao.insert(historyData(history = currentWord))
+            }
         } else {
             // User's guess is wrong, show an error
             _uiState.update { currentState ->
@@ -138,7 +153,6 @@ class GameViewModel : ViewModel() {
             pickRandomWordAndShuffle()
         } else {
             usedWords.add(currentWord)
-            history.add(currentWord)
             shuffleCurrentWord(currentWord)
         }
     }

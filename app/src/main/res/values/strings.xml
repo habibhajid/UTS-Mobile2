@@ -28,5 +28,6 @@
     <string name="play_again">Play Again</string>
     <string name="wrong_guess">Wrong Guess!</string>
     <string name="history">History</string>
+    <string name="back">Back</string>
 
 </resources>
