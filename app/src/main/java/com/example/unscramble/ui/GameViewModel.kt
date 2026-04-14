@@ -82,14 +82,16 @@ class GameViewModel(private val dao: historyDAO) : ViewModel() {
      */
     fun checkUserGuess() {
         if (userGuess.equals(currentWord, ignoreCase = true)) {
+
+            viewModelScope.launch {
+                dao.insert(historyData(history = currentWord))
+            }
             // User's guess is correct, increase the score
             // and call updateGameState() to prepare the game for next round
             val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
             updateGameState(updatedScore)
 
-            viewModelScope.launch {
-                dao.insert(historyData(history = currentWord))
-            }
+
         } else {
             // User's guess is wrong, show an error
             _uiState.update { currentState ->
