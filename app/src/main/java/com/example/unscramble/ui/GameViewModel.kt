@@ -44,6 +44,8 @@ class GameViewModel : ViewModel() {
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String
 
+    var history: MutableSet<String> = mutableSetOf()
+
     init {
         resetGame()
     }
@@ -136,6 +138,7 @@ class GameViewModel : ViewModel() {
             pickRandomWordAndShuffle()
         } else {
             usedWords.add(currentWord)
+            history.add(currentWord)
             shuffleCurrentWord(currentWord)
         }
     }

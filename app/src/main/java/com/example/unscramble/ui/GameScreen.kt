@@ -102,12 +102,22 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 onClick = { gameViewModel.checkUserGuess() }
             ) {
                 Text(
+                    text = stringResource(R.string.history),
+                    fontSize = 16.sp
+                )
+            }
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { gameViewModel.checkUserGuess() }
+            ) {
+                Text(
                     text = stringResource(R.string.submit),
                     fontSize = 16.sp
                 )
             }
 
-            OutlinedButton(
+            Button(
                 onClick = { gameViewModel.skipWord() },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -249,6 +259,8 @@ private fun FinalScoreDialog(
         }
     )
 }
+
+
 
 @Preview(showBackground = true)
 @Composable
